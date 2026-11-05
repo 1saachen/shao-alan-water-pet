@@ -133,6 +133,15 @@ class PersistenceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.store.record(self.now, amount)
 
+    def test_scale_defaults_and_bounds_roundtrip(self):
+        self.assertEqual(Settings.from_dict({}).pet_scale, 100)
+        self.assertEqual(Settings.from_dict({"pet_scale": "bad"}).pet_scale, 100)
+        self.assertEqual(Settings.from_dict({"pet_scale": 10000}).pet_scale, 200)
+        self.assertEqual(Settings.from_dict({"pet_scale": -1}).pet_scale, 50)
+        self.store.settings.pet_scale = 75
+        self.store.save()
+        self.assertEqual(Store(self.directory).settings.pet_scale, 75)
+
 
 class QuoteTests(unittest.TestCase):
     def test_time_buckets(self):

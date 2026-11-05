@@ -29,6 +29,7 @@ class Settings:
     quiet_end: str = "08:00"
     notifications: bool = True
     paused: bool = False
+    pet_scale: int = 100
     position: list[int] | None = None
     custom_lines: list[str] = field(default_factory=list)
 
@@ -43,7 +44,8 @@ class Settings:
                 value = value if isinstance(value, bool) else default
             clean[item.name] = value
         for key, low, high in [("interval_minutes", 5, 180), ("cup_ml", 50, 1000),
-                               ("goal_ml", 200, 5000), ("chatter_minutes", 5, 180)]:
+                               ("goal_ml", 200, 5000), ("chatter_minutes", 5, 180),
+                               ("pet_scale", 50, 200)]:
             try:
                 clean[key] = max(low, min(high, int(clean[key])))
             except (TypeError, ValueError, OverflowError):

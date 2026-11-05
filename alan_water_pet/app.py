@@ -9,12 +9,13 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from PySide6.QtCore import QLockFile, QObject, QTimer
-from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
+from PySide6.QtGui import QActionGroup, QFont, QFontDatabase, QGuiApplication
 from PySide6.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon
 
 from .art import app_icon
 from .core import QuoteBook, Scheduler, Store, data_directory, time_category
-from .ui import ControlPanel, PetWindow
+from .ui import PetWindow
+from .panels import ControlPanel
 
 
 class Controller(QObject):
@@ -33,6 +34,16 @@ class Controller(QObject):
         self.menu.addAction("找到桌宠", self.show_pet)
         self.menu.addAction("喝水提醒演示", self.preview_reminder)
         self.menu.addAction("换一句", self.say_something)
+        size_menu = self.menu.addMenu("桌宠大小（也可滚轮调整）")
+        self.size_group = QActionGroup(self)
+        self.size_actions = {}
+        for percent in (50, 75, 100, 125, 150, 200):
+            action = size_menu.addAction(f"{percent}%" + (" · 默认" if percent == 100 else ""))
+            action.setCheckable(True)
+            action.setChecked(percent == self.store.settings.pet_scale)
+            action.triggered.connect(lambda checked=False, p=percent: self.set_pet_scale(p))
+            self.size_group.addAction(action)
+            self.size_actions[percent] = action
         self.menu.addSeparator()
         self.menu.addAction("我喝水了", self.record_drink)
         self.menu.addAction("10 分钟后提醒", self.snooze)
@@ -54,7 +65,25 @@ class Controller(QObject):
         app.screenRemoved.connect(self.screen_changed)
 
     def screen_changed(self, screen):
-        QTimer.singleShot(100, self.clamp_pet)
+        QTimer.singleShot(100, self.fit_pet_to_screen)
+
+    def fit_pet_to_screen(self):
+        self.pet.apply_scale(self.store.settings.pet_scale)
+        self.clamp_pet()
+
+    def adjust_pet_scale(self, delta):
+        self.set_pet_scale(self.store.settings.pet_scale + delta)
+
+    def set_pet_scale(self, percent):
+        percent = max(50, min(200, int(percent)))
+        self.store.settings.pet_scale = percent
+        self.pet.apply_scale(percent)
+        self.clamp_pet()
+        self.store.settings.position = [self.pet.x(), self.pet.y()]
+        self.panel.sync_scale(percent)
+        for value, action in self.size_actions.items():
+            action.setChecked(value == percent)
+        self.persist()
 
     def persist(self):
         try:

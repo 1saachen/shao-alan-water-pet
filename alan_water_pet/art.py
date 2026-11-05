@@ -1,5 +1,6 @@
-"""Original vector character drawn with Qt, no downloaded portrait or assets."""
+"""Generated character sprite, with the original Qt drawing retained as a fallback."""
 import math
+from pathlib import Path
 
 from PySide6.QtCore import QPoint, QPointF, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPainterPath, QPen, QPixmap
@@ -121,7 +122,7 @@ def app_icon() -> QIcon:
     p = QPainter(pixmap)
     p.setRenderHint(QPainter.RenderHint.Antialiasing)
     p.setPen(Qt.PenStyle.NoPen)
-    p.setBrush(QColor("#173f37"))
+    p.setBrush(QColor("#1768d5"))
     p.drawRoundedRect(QRectF(0, 0, 64, 64), 16, 16)
     bottle(p, 14, 3, .66)
     p.end()
@@ -134,12 +135,15 @@ class Avatar(QWidget):
     drag_delta = Signal(QPoint)
     drag_finished = Signal()
     context_requested = Signal(QPoint)
+    scale_requested = Signal(int)
 
     def __init__(self, parent=None, interactive=False):
         super().__init__(parent)
         self.phase = 0.0
         self.mood = "idle"
         self.interactive = interactive
+        self.sprite = QPixmap(str(Path(__file__).with_name("assets") / "alan-chibi-v1.png"))
+        self._wheel_remainder = 0
         self._origin = self._last = None
         self._dragged = False
         self._single = QTimer(self)
@@ -150,7 +154,7 @@ class Avatar(QWidget):
         self._animation.start(70)
         if interactive:
             self.setCursor(Qt.CursorShape.OpenHandCursor)
-            self.setToolTip("拖动搬家 · 点击换句话 · 双击打开面板 · 右键菜单")
+            self.setToolTip("滚轮缩放 · 拖动搬家 · 点击换句话 · 双击面板 · 右键菜单")
 
     def animate(self):
         if self.isVisible():
@@ -159,7 +163,28 @@ class Avatar(QWidget):
 
     def paintEvent(self, event):
         p = QPainter(self)
-        draw_character(p, QRectF(self.rect()), self.phase, self.mood)
+        if self.sprite.isNull():
+            draw_character(p, QRectF(self.rect()), self.phase, self.mood)
+            return
+        p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        bounds = QRectF(self.rect()).adjusted(5, 6, -5, -5)
+        size = self.sprite.size().scaled(bounds.size().toSize(), Qt.AspectRatioMode.KeepAspectRatio)
+        lift = math.sin(self.phase * 2) * 3 if self.mood in ("drink", "happy") else 0
+        p.translate(bounds.center().x(), bounds.bottom() - size.height() / 2 + math.sin(self.phase) * 2 - lift)
+        p.rotate(math.sin(self.phase / 2) * .7)
+        p.drawPixmap(QRectF(-size.width() / 2, -size.height() / 2, size.width(), size.height()),
+                     self.sprite, QRectF(self.sprite.rect()))
+
+    def wheelEvent(self, event):
+        if not self.interactive:
+            event.ignore()
+            return
+        self._wheel_remainder += event.angleDelta().y()
+        steps = int(self._wheel_remainder / 120)
+        if steps:
+            self._wheel_remainder -= steps * 120
+            self.scale_requested.emit(steps * 10)
+        event.accept()
 
     def mousePressEvent(self, event):
         if self.interactive and event.button() == Qt.MouseButton.LeftButton:

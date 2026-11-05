@@ -1,5 +1,9 @@
 # Third-party notices
 
+## Character illustration
+
+`alan_water_pet/assets/alan-chibi-v1.png` was created with the built-in image generation tool, using Shao Alan's own public Bilibili video cover as visual reference. The source photo is not redistributed. This is an unofficial generated illustration, with no claim of the depicted person's endorsement. See `docs/character.md` for source and prompt.
+
 ## shao-alan-skill
 
 Expression rules are informed by and paraphrased from [Roc-Dove/shao-alan-skill](https://github.com/Roc-Dove/shao-alan-skill), commit `899ae3e77c14a07a930c21a16856dea1b8385c6d`.

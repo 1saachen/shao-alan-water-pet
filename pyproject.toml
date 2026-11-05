@@ -1,6 +1,6 @@
 [project]
 name = "shao-alan-water-pet"
-version = "0.1.0"
+version = "0.2.0"
 description = "邵艾伦风格的喝大水提醒桌宠"
 requires-python = ">=3.11"
 dependencies = ["PySide6-Essentials==6.10.2"]

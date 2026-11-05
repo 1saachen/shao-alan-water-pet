@@ -7,7 +7,7 @@ if (-not (Test-Path -LiteralPath $pythonExe)) {
 }
 & $pythonExe -m unittest discover -s tests -v
 if ($LASTEXITCODE -ne 0) { throw '测试未通过，停止打包。' }
-& $pythonExe -m PyInstaller --noconfirm --clean --windowed --onedir --name AlanWaterPet --add-data 'alan_water_pet/quotes.json;alan_water_pet' --add-data 'LICENSE;.' --add-data 'THIRD_PARTY_NOTICES.md;.' --add-data 'README.md;.' main.py
+& $pythonExe -m PyInstaller --noconfirm --clean --windowed --onedir --name AlanWaterPet --add-data 'alan_water_pet/quotes.json;alan_water_pet' --add-data 'alan_water_pet/assets;alan_water_pet/assets' --add-data 'LICENSE;.' --add-data 'THIRD_PARTY_NOTICES.md;.' --add-data 'README.md;.' main.py
 if ($LASTEXITCODE -ne 0) { throw '打包失败。' }
 # Qt's Windows build uses the OS ICU API. A different ICU from an unrelated
 # PATH entry (e.g. Poppler/Conda) exports versioned names and breaks QtCore.
@@ -34,5 +34,5 @@ if ($smokeProcess.ExitCode -ne 0) { throw '便携版启动检查未通过，停�
 foreach ($previewFile in @('dashboard.png', 'pet.png', 'settings.png', 'quotes.png')) {
     if (-not (Test-Path -LiteralPath (Join-Path $smokeDirectory $previewFile))) { throw ('缺少预览：' + $previewFile) }
 }
-Compress-Archive -Path (Join-Path $projectRoot 'dist\AlanWaterPet') -DestinationPath (Join-Path $projectRoot 'dist\AlanWaterPet-0.1.0-windows-x64.zip') -Force
-Write-Output '已生成 dist\AlanWaterPet-0.1.0-windows-x64.zip，解压后运行 AlanWaterPet.exe。'
+Compress-Archive -Path (Join-Path $projectRoot 'dist\AlanWaterPet') -DestinationPath (Join-Path $projectRoot 'dist\AlanWaterPet-0.2.0-windows-x64.zip') -Force
+Write-Output '已生成 dist\AlanWaterPet-0.2.0-windows-x64.zip，解压后运行 AlanWaterPet.exe。'
