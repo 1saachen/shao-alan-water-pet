@@ -77,6 +77,7 @@ class PetWindow(QWidget):
         self.status.setParent(self)
         self.status.setGeometry(72, 377, 186, 24)
         self.status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.status.setVisible(controller.store.settings.show_countdown)
         self.hide_timer = QTimer(self)
         self.hide_timer.setSingleShot(True)
         self.hide_timer.timeout.connect(self.bubble.hide)

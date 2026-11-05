@@ -103,7 +103,7 @@ class ControlPanel(QMainWindow):
         self.build_quotes()
         self.navigate(0)
         self.statusBar().setSizeGripEnabled(False)
-        self.statusBar().showMessage("非官方风格模拟    ·    记录保存在这台电脑    ·    v0.2.0")
+        self.statusBar().showMessage("非官方风格模拟    ·    记录保存在这台电脑    ·    v0.2.1")
         self.statusBar().setStyleSheet("QStatusBar { color: #8493a5; font-size: 11px; background: #ffffff; border-top: 1px solid #edf2f8; padding: 3px 20px; }")
 
     def navigate(self, index):
@@ -273,6 +273,9 @@ class ControlPanel(QMainWindow):
         for percent in (75, 100, 150):
             presets.addWidget(button(f"{percent}%", lambda checked=False, p=percent: self.controller.set_pet_scale(p)))
         appearance_layout.addLayout(presets)
+        self.show_countdown = QCheckBox("显示桌宠下方的倒计时")
+        self.show_countdown.setChecked(self.controller.store.settings.show_countdown)
+        appearance_layout.addWidget(self.show_countdown)
         appearance_layout.addWidget(label("立即生效并记住大小。也可以在桌宠上滚动滚轮，或右键选择比例。气泡文字保持清晰。", "muted", True))
         columns.addWidget(appearance, 2)
         layout.addLayout(columns, 1)
@@ -286,6 +289,7 @@ class ControlPanel(QMainWindow):
         self.load_settings()
         self.pet_size.valueChanged.connect(self.controller.set_pet_scale)
         self.scale_slider.valueChanged.connect(self.controller.set_pet_scale)
+        self.show_countdown.toggled.connect(self.controller.set_countdown_visible)
 
     def sync_scale(self, percent):
         for widget in (self.pet_size, self.scale_slider):

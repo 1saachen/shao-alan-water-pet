@@ -12,6 +12,7 @@
 
 - Windows 透明置顶桌宠，拖拽、轻微呼吸摇摆和提醒时的跃动。
 - **50%–200% 大小调节**：人物上滚动滚轮、右键选择比例，或在“提醒与外观”里拖动滑条；自动记住上次的大小。气泡文字保持可读。
+- 桌宠脚下的倒计时可隐藏：右键取消“显示倒计时”，或在“提醒与外观”里关闭“显示桌宠下方的倒计时”。自动记住选择，喝水提醒照常运行。
 - 水蓝与白色的新界面：今日记录、提醒与外观、台词三个页面；按场景预览台词并让桌宠试播。
 - 默认每 45 分钟提醒喝水；气泡中确认喝了，或延后 10 分钟。
 - 分时段台词或随机闲聊，默认每 20 分钟一句，可关闭；支持自定义台词。
@@ -71,7 +72,7 @@ v0.2 采用 [Anthropic frontend-design](https://github.com/anthropics/skills/tre
 .\scripts\build.ps1
 ```
 
-预览命令生成面板、桌宠、设置和台词页 PNG，并使用独立数据目录，不改动个人记录。便携包输出到 `dist/AlanWaterPet-0.2.0-windows-x64.zip`。GitHub Actions 同步测试并构建 Windows artifact。
+预览命令生成面板、桌宠、设置和台词页 PNG，并使用独立数据目录，不改动个人记录。便携包输出到 `dist/AlanWaterPet-0.2.1-windows-x64.zip`。GitHub Actions 同步测试并构建 Windows artifact。
 
 ```text
 alan_water_pet/core.py     时间调度、本地状态和台词选择

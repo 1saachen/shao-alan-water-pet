@@ -44,6 +44,10 @@ class Controller(QObject):
             action.triggered.connect(lambda checked=False, p=percent: self.set_pet_scale(p))
             self.size_group.addAction(action)
             self.size_actions[percent] = action
+        self.countdown_action = self.menu.addAction("显示倒计时")
+        self.countdown_action.setCheckable(True)
+        self.countdown_action.setChecked(self.store.settings.show_countdown)
+        self.countdown_action.toggled.connect(self.set_countdown_visible)
         self.menu.addSeparator()
         self.menu.addAction("我喝水了", self.record_drink)
         self.menu.addAction("10 分钟后提醒", self.snooze)
@@ -93,6 +97,15 @@ class Controller(QObject):
             logging.exception("Unable to persist local settings")
             QMessageBox.warning(self.panel, "保存未完成", "本地文件暂时无法写入。请检查可用空间和文件权限，当前会话仍可继续使用。")
             return False
+
+    def set_countdown_visible(self, visible):
+        self.store.settings.show_countdown = bool(visible)
+        self.pet.status.setVisible(bool(visible))
+        for control in (self.countdown_action, self.panel.show_countdown):
+            control.blockSignals(True)
+            control.setChecked(bool(visible))
+            control.blockSignals(False)
+        self.persist()
 
     def save_position(self):
         self.store.settings.position = [self.pet.x(), self.pet.y()]

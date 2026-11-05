@@ -30,6 +30,7 @@ class Settings:
     notifications: bool = True
     paused: bool = False
     pet_scale: int = 100
+    show_countdown: bool = True
     position: list[int] | None = None
     custom_lines: list[str] = field(default_factory=list)
 
