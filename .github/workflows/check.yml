@@ -1,0 +1,27 @@
+name: Test and build Windows app
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Create environment
+        run: python -m venv .venv
+      - name: Install dependencies
+        run: .venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+      - name: Test and package
+        shell: pwsh
+        run: ./scripts/build.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AlanWaterPet-windows-x64
+          path: dist/AlanWaterPet-0.1.0-windows-x64.zip
